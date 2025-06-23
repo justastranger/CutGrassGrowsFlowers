@@ -175,7 +175,7 @@ namespace CutGrassGrowsFlowers
             matcher.InstructionAt(3).labels.Add(IL_0412);
             List<CodeInstruction> sixthInsertion = new List<CodeInstruction>()
             {
-                new CodeInstruction(OpCodes.Ldc_I4, 25),
+                new CodeInstruction(OpCodes.Ldc_I4, 24),
                 new CodeInstruction(OpCodes.Beq, IL_0412),
                 new CodeInstruction(OpCodes.Ldloc_1),
                 new CodeInstruction(OpCodes.Ldfld, tileTypeMapField),
