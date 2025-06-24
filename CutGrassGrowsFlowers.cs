@@ -72,13 +72,12 @@ namespace CutGrassGrowsFlowers
 
             CodeMatch[] secondTarget = new CodeMatch[]
             {
-                // insert new code here
                 new CodeMatch(OpCodes.Ldarg_0),
                 new CodeMatch(OpCodes.Ldfld, tropicalGrassTypeField),
                 new CodeMatch(OpCodes.Beq) // label is the same as previous jump, can ignore
             };
-
             matcher.MatchStartForward(secondTarget);
+
             List<CodeInstruction> secondInsertion = new List<CodeInstruction>()
             {
                 new CodeInstruction(OpCodes.Ldc_I4, 25),
@@ -100,6 +99,7 @@ namespace CutGrassGrowsFlowers
             };
 
             matcher.MatchStartForward(thirdTarget);
+
             List<CodeInstruction> thirdInsertion = new List<CodeInstruction>()
             {
                 new CodeInstruction(OpCodes.Ldc_I4, 24),
@@ -114,7 +114,6 @@ namespace CutGrassGrowsFlowers
 
             CodeMatch[] fourthTarget = new CodeMatch[]
             {
-                // insert new code here
                 new CodeMatch(OpCodes.Ldarg_0),
                 new CodeMatch(OpCodes.Ldfld, grassTypeField),
                 new CodeMatch(OpCodes.Bne_Un),
@@ -152,7 +151,7 @@ namespace CutGrassGrowsFlowers
             List<CodeInstruction> fifthInsertion = new List<CodeInstruction>()
             {
                 new CodeInstruction(OpCodes.Ldc_I4, 25),
-                new CodeInstruction(OpCodes.Bne_Un, IL_03de),
+                new CodeInstruction(OpCodes.Beq, IL_03de),
                 new CodeInstruction(OpCodes.Ldloc_1),
                 new CodeInstruction(OpCodes.Ldfld, tileTypeMapField),
                 new CodeInstruction(OpCodes.Ldloc_3),
