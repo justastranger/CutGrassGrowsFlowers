@@ -216,8 +216,8 @@ namespace CutGrassGrowsFlowers
 
                 new CodeInstruction(OpCodes.Br, inlineEndLabel).WithLabels(inlineJumpLabel), // jump target that needs label
 
-                new CodeInstruction(OpCodes.Pop).WithLabels(inlinePopLabel),
-                new CodeInstruction(OpCodes.Nop).WithLabels(inlineEndLabel) // jump target that needs label
+                new CodeInstruction(OpCodes.Pop).WithLabels(inlinePopLabel)
+                // new CodeInstruction(OpCodes.Nop).WithLabels(inlineEndLabel) // jump target that needs label
             };
             CodeMatch[] callvirtTarget = new CodeMatch[]
             {
@@ -226,6 +226,8 @@ namespace CutGrassGrowsFlowers
                 new CodeMatch(OpCodes.Callvirt, getRandomObjectAndPlaceWithGrowthMethod)
             };
             matcher.MatchEndForward(callvirtTarget);
+            // give the inlineEndLabel to the br jump that'r right after the callvirt
+            matcher.InstructionAt(1).labels.Add(inlineEndLabel);
             // remove the callvirt to getRandomObjectAndPlaceWithGrowth
             matcher.RemoveInstruction();
             // insert our custom version of the function
