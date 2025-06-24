@@ -44,7 +44,20 @@ namespace CutGrassGrowsFlowers
             FieldInfo tropicalGrassTypeField = typeof(WorldManager).GetNestedType("<nextDayChanges>d__135", BindingFlags.NonPublic).GetField("<tropicalGrassType>5__5", BindingFlags.Instance | BindingFlags.NonPublic);
             FieldInfo pineGrassTypeField = typeof(WorldManager).GetNestedType("<nextDayChanges>d__135", BindingFlags.NonPublic).GetField("<pineGrassType>5__6", BindingFlags.Instance | BindingFlags.NonPublic);
             FieldInfo tileTypeMapField = AccessTools.Field(typeof(WorldManager), "tileTypeMap");
+
+            FieldInfo onTileMapField = AccessTools.Field(typeof(WorldManager), "onTileMap");
+            FieldInfo onTileStatusMapField = AccessTools.Field(typeof(WorldManager), "onTileStatusMap");
+            FieldInfo allObjectsField = AccessTools.Field(typeof(WorldManager), "allObjects");
+            FieldInfo generateField = AccessTools.Field(typeof(GenerateMap), "generate");
+            FieldInfo bushLandGrowBackField = AccessTools.Field(typeof(GenerateMap), "bushLandGrowBack");
+            FieldInfo tileObjectGrowthStagesField = AccessTools.Field(typeof(TileObject), "tileObjectGrowthStages");
+
             MethodInfo arrayGetMethod = typeof(int[,]).GetMethod("Get", new[] { typeof(int), typeof(int) });
+            MethodInfo arraySetMethod = typeof(int[,]).GetMethod("Set", new[] { typeof(int), typeof(int), typeof(int) });
+            MethodInfo getBiomObjectMethod = typeof(BiomSpawnTable).GetMethod("getBiomObject", new Type[] { typeof(MapRand) });
+            MethodInfo op_ImplicitMethod = typeof(UnityEngine.Object).GetMethod("op_Implicit");
+            MethodInfo getRandomObjectAndPlaceWithGrowthMethod = typeof(BiomSpawnTable).GetMethod("getRandomObjectAndPlaceWithGrowth", new Type[] { typeof(int), typeof(int) });
+
 
             CodeMatcher matcher = new CodeMatcher(instructions, generator);
 
@@ -135,6 +148,87 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Call, arrayGetMethod)
             };
             matcher.Insert(fourthInsertion);
+
+
+            // cursed bullshit to inline a function call
+            Label firstJumpLabel = generator.DefineLabel();
+            Label secondJumpLabel = generator.DefineLabel();
+            Label thirdJumpLabel = generator.DefineLabel();
+            Label fourthJumpLabel = generator.DefineLabel();
+            List<CodeInstruction> inlineGetRandomObjectAndPlaceWithGrowth = new List<CodeInstruction>()
+            {
+                new CodeInstruction(OpCodes.Ldloc_1),
+                new CodeInstruction(OpCodes.Ldfld, onTileMapField),
+                new CodeInstruction(OpCodes.Ldloc_3),
+                new CodeInstruction(OpCodes.Ldloc_2),
+                new CodeInstruction(OpCodes.Ldsfld, generateField),
+                new CodeInstruction(OpCodes.Ldfld, bushLandGrowBackField),
+                new CodeInstruction(OpCodes.Ldnull),
+                new CodeInstruction(OpCodes.Call, getBiomObjectMethod),
+
+                // check if we're trying to spawn on cut grass, skipping the next check if it's regular grass
+                new CodeInstruction(OpCodes.Ldloc_1),
+                new CodeInstruction(OpCodes.Ldfld, tileTypeMapField),
+                new CodeInstruction(OpCodes.Ldloc_3),
+                new CodeInstruction(OpCodes.Ldloc_2),
+                new CodeInstruction(OpCodes.Call, arrayGetMethod),
+                new CodeInstruction(OpCodes.Ldc_I4, 23),
+                new CodeInstruction(OpCodes.Bne_Un, fourthJumpLabel),
+
+                // Check against grass and desert spinifex IDs here
+                new CodeInstruction(OpCodes.Dup),
+                new CodeInstruction(OpCodes.Ldc_I4_1),
+                new CodeInstruction(OpCodes.Beq, thirdJumpLabel),
+                new CodeInstruction(OpCodes.Dup),
+                new CodeInstruction(OpCodes.Ldc_I4, 13),
+                new CodeInstruction(OpCodes.Beq, thirdJumpLabel),
+
+                // if it's acceptable, place it in the world
+                new CodeInstruction(OpCodes.Call, arraySetMethod).WithLabels(fourthJumpLabel),
+
+                new CodeInstruction(OpCodes.Ldloc_1),
+                new CodeInstruction(OpCodes.Ldfld, onTileMapField),
+                new CodeInstruction(OpCodes.Ldloc_3),
+                new CodeInstruction(OpCodes.Ldloc_2),
+                new CodeInstruction(OpCodes.Call, arrayGetMethod),
+                new CodeInstruction(OpCodes.Ldc_I4_M1),
+                new CodeInstruction(OpCodes.Beq, firstJumpLabel), // need label for br
+
+                new CodeInstruction(OpCodes.Ldloc_1),
+                new CodeInstruction(OpCodes.Ldfld, allObjectsField),
+                new CodeInstruction(OpCodes.Ldloc_1),
+                new CodeInstruction(OpCodes.Ldfld, onTileMapField),
+                new CodeInstruction(OpCodes.Ldloc_3),
+                new CodeInstruction(OpCodes.Ldloc_2),
+                new CodeInstruction(OpCodes.Call, arrayGetMethod),
+                new CodeInstruction(OpCodes.Ldelem_Ref),
+                new CodeInstruction(OpCodes.Ldfld, tileObjectGrowthStagesField),
+                new CodeInstruction(OpCodes.Call, op_ImplicitMethod),
+                new CodeInstruction(OpCodes.Brfalse, firstJumpLabel), // same label as beq
+
+                new CodeInstruction(OpCodes.Ldloc_1),
+                new CodeInstruction(OpCodes.Ldfld, onTileStatusMapField),
+                new CodeInstruction(OpCodes.Ldloc_3),
+                new CodeInstruction(OpCodes.Ldloc_2),
+                new CodeInstruction(OpCodes.Ldc_I4_0),
+                new CodeInstruction(OpCodes.Call, arraySetMethod),
+
+                new CodeInstruction(OpCodes.Br, secondJumpLabel).WithLabels(firstJumpLabel), // jump target that needs label
+
+                new CodeInstruction(OpCodes.Pop).WithLabels(thirdJumpLabel),
+                new CodeInstruction(OpCodes.Nop).WithLabels(secondJumpLabel) // jump target that needs label
+            };
+            CodeMatch[] callvirtTarget = new CodeMatch[]
+            {
+                new CodeMatch(OpCodes.Ldloc_3),
+                new CodeMatch(OpCodes.Ldloc_2),
+                new CodeMatch(OpCodes.Callvirt, getRandomObjectAndPlaceWithGrowthMethod)
+            };
+            matcher.MatchEndForward(callvirtTarget);
+            // remove the callvirt to getRandomObjectAndPlaceWithGrowth
+            matcher.RemoveInstruction();
+            // insert our custom version of the function
+            matcher.InsertAndAdvance(inlineGetRandomObjectAndPlaceWithGrowth);
 
             CodeMatch[] fifthTarget = new CodeMatch[]
             {
