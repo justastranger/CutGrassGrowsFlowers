@@ -151,10 +151,10 @@ namespace CutGrassGrowsFlowers
 
 
             // cursed bullshit to inline a function call
-            Label firstJumpLabel = generator.DefineLabel();
-            Label secondJumpLabel = generator.DefineLabel();
-            Label thirdJumpLabel = generator.DefineLabel();
-            Label fourthJumpLabel = generator.DefineLabel();
+            Label inlineJumpLabel = generator.DefineLabel();
+            Label inlineEndLabel = generator.DefineLabel();
+            Label inlinePopLabel = generator.DefineLabel();
+            Label inlinePlaceAllowedLabel = generator.DefineLabel();
             List<CodeInstruction> inlineGetRandomObjectAndPlaceWithGrowth = new List<CodeInstruction>()
             {
                 new CodeInstruction(OpCodes.Ldloc_1),
@@ -173,18 +173,18 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Ldloc_2),
                 new CodeInstruction(OpCodes.Call, arrayGetMethod),
                 new CodeInstruction(OpCodes.Ldc_I4, 23),
-                new CodeInstruction(OpCodes.Bne_Un, fourthJumpLabel),
+                new CodeInstruction(OpCodes.Bne_Un, inlinePlaceAllowedLabel),
 
                 // Check against grass and desert spinifex IDs here
                 new CodeInstruction(OpCodes.Dup),
                 new CodeInstruction(OpCodes.Ldc_I4_1),
-                new CodeInstruction(OpCodes.Beq, thirdJumpLabel),
+                new CodeInstruction(OpCodes.Beq, inlinePopLabel),
                 new CodeInstruction(OpCodes.Dup),
                 new CodeInstruction(OpCodes.Ldc_I4, 13),
-                new CodeInstruction(OpCodes.Beq, thirdJumpLabel),
+                new CodeInstruction(OpCodes.Beq, inlinePopLabel),
 
                 // if it's acceptable, place it in the world
-                new CodeInstruction(OpCodes.Call, arraySetMethod).WithLabels(fourthJumpLabel),
+                new CodeInstruction(OpCodes.Call, arraySetMethod).WithLabels(inlinePlaceAllowedLabel),
 
                 new CodeInstruction(OpCodes.Ldloc_1),
                 new CodeInstruction(OpCodes.Ldfld, onTileMapField),
@@ -192,7 +192,7 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Ldloc_2),
                 new CodeInstruction(OpCodes.Call, arrayGetMethod),
                 new CodeInstruction(OpCodes.Ldc_I4_M1),
-                new CodeInstruction(OpCodes.Beq, firstJumpLabel), // need label for br
+                new CodeInstruction(OpCodes.Beq, inlineJumpLabel), // need label for br
 
                 new CodeInstruction(OpCodes.Ldloc_1),
                 new CodeInstruction(OpCodes.Ldfld, allObjectsField),
@@ -204,7 +204,7 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Ldelem_Ref),
                 new CodeInstruction(OpCodes.Ldfld, tileObjectGrowthStagesField),
                 new CodeInstruction(OpCodes.Call, op_ImplicitMethod),
-                new CodeInstruction(OpCodes.Brfalse, firstJumpLabel), // same label as beq
+                new CodeInstruction(OpCodes.Brfalse, inlineJumpLabel), // same label as beq
 
                 new CodeInstruction(OpCodes.Ldloc_1),
                 new CodeInstruction(OpCodes.Ldfld, onTileStatusMapField),
@@ -213,10 +213,10 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Ldc_I4_0),
                 new CodeInstruction(OpCodes.Call, arraySetMethod),
 
-                new CodeInstruction(OpCodes.Br, secondJumpLabel).WithLabels(firstJumpLabel), // jump target that needs label
+                new CodeInstruction(OpCodes.Br, inlineEndLabel).WithLabels(inlineJumpLabel), // jump target that needs label
 
-                new CodeInstruction(OpCodes.Pop).WithLabels(thirdJumpLabel),
-                new CodeInstruction(OpCodes.Nop).WithLabels(secondJumpLabel) // jump target that needs label
+                new CodeInstruction(OpCodes.Pop).WithLabels(inlinePopLabel),
+                new CodeInstruction(OpCodes.Nop).WithLabels(inlineEndLabel) // jump target that needs label
             };
             CodeMatch[] callvirtTarget = new CodeMatch[]
             {
