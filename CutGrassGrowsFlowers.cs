@@ -268,11 +268,8 @@ namespace CutGrassGrowsFlowers
             };
             matcher.MatchEndForward(tropicalGrowBackTarget);
             matcher.Instruction.labels.Add(tropicalGrowBackCallLabel);
-            // move to the br instruction to label it
-            matcher.Advance(1);
-            matcher.Instruction.labels.Add(tropicalGrowBackBreakLabel);
-            // move back so we can insert before the call to Set
-            matcher.Advance(-1);
+            // give a label to the br jump instruction
+            matcher.InstructionAt(1).labels.Add(tropicalGrowBackBreakLabel);
 
             Label tropicalGrowBackPopLabel = generator.DefineLabel();
             List<CodeInstruction> tropicalGrowBackInsertion = new List<CodeInstruction>()
