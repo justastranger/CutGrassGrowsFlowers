@@ -51,6 +51,7 @@ namespace CutGrassGrowsFlowers
             FieldInfo generateField = AccessTools.Field(typeof(GenerateMap), "generate");
             FieldInfo bushLandGrowBackField = AccessTools.Field(typeof(GenerateMap), "bushLandGrowBack");
             FieldInfo tropicalGrowBackField = AccessTools.Field(typeof(GenerateMap), "tropicalGrowBack");
+            FieldInfo coldLandGrowBackField = AccessTools.Field(typeof(GenerateMap), "coldLandGrowBack");
             FieldInfo tileObjectGrowthStagesField = AccessTools.Field(typeof(TileObject), "tileObjectGrowthStages");
 
             MethodInfo arrayGetMethod = typeof(int[,]).GetMethod("Get", new[] { typeof(int), typeof(int) });
@@ -62,17 +63,17 @@ namespace CutGrassGrowsFlowers
 
             CodeMatcher matcher = new CodeMatcher(instructions, generator);
 
-            CodeMatch[] firstTarget = new CodeMatch[]
+            CodeMatch[] bushLandGrassOuterTarget = new CodeMatch[]
             {
                 new CodeMatch(OpCodes.Ldarg_0),
                 new CodeMatch(OpCodes.Ldfld, grassTypeField),
                 new CodeMatch(OpCodes.Beq) // grab label from operand
             };
-            matcher.MatchStartForward(firstTarget);
+            matcher.MatchStartForward(bushLandGrassOuterTarget);
 
             // grab label for start of inner if statement
             var IL_03a1 = matcher.InstructionAt(2).operand;
-            List<CodeInstruction> firstInsertion = new List<CodeInstruction>()
+            List<CodeInstruction> cutBushLandGrassOuterInsertion = new List<CodeInstruction>()
             {
                 new CodeInstruction(OpCodes.Ldc_I4, 23),
                 new CodeInstruction(OpCodes.Beq, IL_03a1),
@@ -82,17 +83,17 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Ldloc_2),
                 new CodeInstruction(OpCodes.Call, arrayGetMethod)
             };
-            matcher.Insert(firstInsertion);
+            matcher.Insert(cutBushLandGrassOuterInsertion);
 
-            CodeMatch[] secondTarget = new CodeMatch[]
+            CodeMatch[] tropicalGrassOuterTarget = new CodeMatch[]
             {
                 new CodeMatch(OpCodes.Ldarg_0),
                 new CodeMatch(OpCodes.Ldfld, tropicalGrassTypeField),
                 new CodeMatch(OpCodes.Beq) // label is the same as previous jump, can ignore
             };
-            matcher.MatchStartForward(secondTarget);
+            matcher.MatchStartForward(tropicalGrassOuterTarget);
 
-            List<CodeInstruction> secondInsertion = new List<CodeInstruction>()
+            List<CodeInstruction> cutTropicalGrassOuterInsertion = new List<CodeInstruction>()
             {
                 new CodeInstruction(OpCodes.Ldc_I4, 25),
                 new CodeInstruction(OpCodes.Beq, IL_03a1),
@@ -102,19 +103,18 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Ldloc_2),
                 new CodeInstruction(OpCodes.Call, arrayGetMethod)
             };
-            matcher.Insert(secondInsertion);
+            matcher.Insert(cutTropicalGrassOuterInsertion);
 
-            CodeMatch[] thirdTarget = new CodeMatch[]
+            CodeMatch[] firGrassOuterTarget = new CodeMatch[]
             {
                 // insert new code here
                 new CodeMatch(OpCodes.Ldarg_0),
                 new CodeMatch(OpCodes.Ldfld, pineGrassTypeField),
                 new CodeMatch(OpCodes.Bne_Un)  // grab label from operand
             };
+            matcher.MatchStartForward(firGrassOuterTarget);
 
-            matcher.MatchStartForward(thirdTarget);
-
-            List<CodeInstruction> thirdInsertion = new List<CodeInstruction>()
+            List<CodeInstruction> cutFirGrassOuterInsertion = new List<CodeInstruction>()
             {
                 new CodeInstruction(OpCodes.Ldc_I4, 24),
                 new CodeInstruction(OpCodes.Beq, IL_03a1),
@@ -124,21 +124,21 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Ldloc_2),
                 new CodeInstruction(OpCodes.Call, arrayGetMethod)
             };
-            matcher.Insert(thirdInsertion);
+            matcher.Insert(cutFirGrassOuterInsertion);
 
-            CodeMatch[] fourthTarget = new CodeMatch[]
+            CodeMatch[] bushLandGrassInnerTarget = new CodeMatch[]
             {
                 new CodeMatch(OpCodes.Ldarg_0),
                 new CodeMatch(OpCodes.Ldfld, grassTypeField),
                 new CodeMatch(OpCodes.Bne_Un),
                 new CodeMatch(OpCodes.Ldsfld)
             };
-            matcher.MatchStartForward(fourthTarget);
+            matcher.MatchStartForward(bushLandGrassInnerTarget);
 
             // grab label for inside if block
             var IL_03b6 = generator.DefineLabel();
             matcher.InstructionAt(3).labels.Add(IL_03b6);
-            List<CodeInstruction> fourthInsertion = new List<CodeInstruction>()
+            List<CodeInstruction> cutBushLandGrassInnerInsertion = new List<CodeInstruction>()
             {
                 new CodeInstruction(OpCodes.Ldc_I4, 23),
                 new CodeInstruction(OpCodes.Beq, IL_03b6),
@@ -148,7 +148,7 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Ldloc_2),
                 new CodeInstruction(OpCodes.Call, arrayGetMethod)
             };
-            matcher.Insert(fourthInsertion);
+            matcher.Insert(cutBushLandGrassInnerInsertion);
 
 
             // cursed bullshit to inline a function call
@@ -243,7 +243,7 @@ namespace CutGrassGrowsFlowers
             // grab label for inside if block
             var IL_03de = generator.DefineLabel();
             matcher.InstructionAt(3).labels.Add(IL_03de);
-            List<CodeInstruction> fifthInsertion = new List<CodeInstruction>()
+            List<CodeInstruction> cutTropicalGrassInnerInsertion = new List<CodeInstruction>()
             {
                 new CodeInstruction(OpCodes.Ldc_I4, 25),
                 new CodeInstruction(OpCodes.Beq, IL_03de),
@@ -253,7 +253,7 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Ldloc_2),
                 new CodeInstruction(OpCodes.Call, arrayGetMethod)
             };
-            matcher.Insert(fifthInsertion);
+            matcher.Insert(cutTropicalGrassInnerInsertion);
 
             Label tropicalGrowBackCallLabel = generator.DefineLabel();
             Label tropicalGrowBackBreakLabel = generator.DefineLabel();
@@ -303,25 +303,25 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Dup),
                 new CodeInstruction(OpCodes.Ldc_I4, 297),
                 new CodeInstruction(OpCodes.Bne_Un, tropicalGrowBackCallLabel), // jump to the Set call if it's not any of the 5 values
-                // flow through to the Call Set
+                
                 new CodeInstruction(OpCodes.Pop).WithLabels(tropicalGrowBackPopLabel),
                 new CodeInstruction(OpCodes.Br, tropicalGrowBackBreakLabel)
             };
             matcher.InsertAndAdvance(tropicalGrowBackInsertion);
 
-            CodeMatch[] sixthTarget = new CodeMatch[]
+            CodeMatch[] firGrassInnerTarget = new CodeMatch[]
             {
                 // insert new code here
                 new CodeMatch(OpCodes.Ldarg_0),
                 new CodeMatch(OpCodes.Ldfld, pineGrassTypeField),
-                new CodeMatch(OpCodes.Bne_Un) // grab label from operand
+                new CodeMatch(OpCodes.Bne_Un)
             };
-            matcher.MatchStartForward(sixthTarget);
+            matcher.MatchStartForward(firGrassInnerTarget);
 
             // grab label for inside if block
             var IL_0412 = generator.DefineLabel();
             matcher.InstructionAt(3).labels.Add(IL_0412);
-            List<CodeInstruction> sixthInsertion = new List<CodeInstruction>()
+            List<CodeInstruction> cutFirGrassInnerInsertion = new List<CodeInstruction>()
             {
                 new CodeInstruction(OpCodes.Ldc_I4, 24),
                 new CodeInstruction(OpCodes.Beq, IL_0412),
@@ -331,7 +331,45 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Ldloc_2),
                 new CodeInstruction(OpCodes.Call, arrayGetMethod)
             };
-            matcher.Insert(sixthInsertion);
+            matcher.Insert(cutFirGrassInnerInsertion);
+
+            Label coldLandGrowBackCallLabel = generator.DefineLabel();
+            Label coldLandGrowBackBreakLabel = generator.DefineLabel();
+            CodeMatch[] coldLandGrowBackTarget = new CodeMatch[]
+            {
+                new CodeMatch(OpCodes.Ldfld, coldLandGrowBackField),
+                new CodeMatch(OpCodes.Ldnull),
+                new CodeMatch(OpCodes.Callvirt, getBiomObjectMethod),
+                new CodeMatch(OpCodes.Call, arraySetMethod)
+            };
+            matcher.MatchEndForward(coldLandGrowBackTarget);
+            matcher.Instruction.labels.Add(coldLandGrowBackCallLabel);
+            // move to the br instruction to label it
+            matcher.Advance(1);
+            matcher.Instruction.labels.Add(coldLandGrowBackBreakLabel);
+            // move back so we can insert before the call to Set
+            matcher.Advance(-1);
+
+            Label coldLandGrowBackPopLabel = generator.DefineLabel();
+            List<CodeInstruction> coldLandGrowBackInsertion = new List<CodeInstruction>()
+            {
+                // check tile type for cut grass
+                new CodeInstruction(OpCodes.Ldloc_1),
+                new CodeInstruction(OpCodes.Ldfld, tileTypeMapField),
+                new CodeInstruction(OpCodes.Ldloc_3),
+                new CodeInstruction(OpCodes.Ldloc_2),
+                new CodeInstruction(OpCodes.Call, arrayGetMethod),
+                new CodeInstruction(OpCodes.Ldc_I4, 24),
+                new CodeInstruction(OpCodes.Bne_Un, coldLandGrowBackCallLabel), // jump straight to the set call if it's regular fir grass
+
+                new CodeInstruction(OpCodes.Dup),
+                new CodeInstruction(OpCodes.Ldc_I4, 137),
+                new CodeInstruction(OpCodes.Bne_Un, coldLandGrowBackCallLabel), // jump to the Set call if it's not cold grass
+                
+                new CodeInstruction(OpCodes.Pop).WithLabels(coldLandGrowBackPopLabel),
+                new CodeInstruction(OpCodes.Br, coldLandGrowBackBreakLabel)
+            };
+            matcher.InsertAndAdvance(tropicalGrowBackInsertion);
 
             return matcher.Instructions();
         }
