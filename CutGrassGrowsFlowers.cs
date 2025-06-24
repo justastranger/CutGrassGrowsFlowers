@@ -83,7 +83,7 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Ldloc_2),
                 new CodeInstruction(OpCodes.Call, arrayGetMethod)
             };
-            matcher.Insert(cutBushLandGrassOuterInsertion);
+            matcher.InsertAndAdvance(cutBushLandGrassOuterInsertion);
 
             CodeMatch[] tropicalGrassOuterTarget = new CodeMatch[]
             {
@@ -103,7 +103,7 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Ldloc_2),
                 new CodeInstruction(OpCodes.Call, arrayGetMethod)
             };
-            matcher.Insert(cutTropicalGrassOuterInsertion);
+            matcher.InsertAndAdvance(cutTropicalGrassOuterInsertion);
 
             CodeMatch[] firGrassOuterTarget = new CodeMatch[]
             {
@@ -124,7 +124,7 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Ldloc_2),
                 new CodeInstruction(OpCodes.Call, arrayGetMethod)
             };
-            matcher.Insert(cutFirGrassOuterInsertion);
+            matcher.InsertAndAdvance(cutFirGrassOuterInsertion);
 
             CodeMatch[] bushLandGrassInnerTarget = new CodeMatch[]
             {
@@ -148,7 +148,7 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Ldloc_2),
                 new CodeInstruction(OpCodes.Call, arrayGetMethod)
             };
-            matcher.Insert(cutBushLandGrassInnerInsertion);
+            matcher.InsertAndAdvance(cutBushLandGrassInnerInsertion);
 
 
             // cursed bullshit to inline a function call
@@ -255,7 +255,7 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Ldloc_2),
                 new CodeInstruction(OpCodes.Call, arrayGetMethod)
             };
-            matcher.Insert(cutTropicalGrassInnerInsertion);
+            matcher.InsertAndAdvance(cutTropicalGrassInnerInsertion);
 
             Label tropicalGrowBackCallLabel = generator.DefineLabel();
             Label tropicalGrowBackBreakLabel = generator.DefineLabel();
