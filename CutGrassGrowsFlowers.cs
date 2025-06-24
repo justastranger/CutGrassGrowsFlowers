@@ -50,6 +50,7 @@ namespace CutGrassGrowsFlowers
             FieldInfo allObjectsField = AccessTools.Field(typeof(WorldManager), "allObjects");
             FieldInfo generateField = AccessTools.Field(typeof(GenerateMap), "generate");
             FieldInfo bushLandGrowBackField = AccessTools.Field(typeof(GenerateMap), "bushLandGrowBack");
+            FieldInfo tropicalGrowBackField = AccessTools.Field(typeof(GenerateMap), "tropicalGrowBack");
             FieldInfo tileObjectGrowthStagesField = AccessTools.Field(typeof(TileObject), "tileObjectGrowthStages");
 
             MethodInfo arrayGetMethod = typeof(int[,]).GetMethod("Get", new[] { typeof(int), typeof(int) });
@@ -253,6 +254,60 @@ namespace CutGrassGrowsFlowers
                 new CodeInstruction(OpCodes.Call, arrayGetMethod)
             };
             matcher.Insert(fifthInsertion);
+
+            Label tropicalGrowBackCallLabel = generator.DefineLabel();
+            Label tropicalGrowBackBreakLabel = generator.DefineLabel();
+            CodeMatch[] tropicalGrowBackTarget = new CodeMatch[]
+            {
+                new CodeMatch(OpCodes.Ldfld, tropicalGrowBackField),
+                new CodeMatch(OpCodes.Ldnull),
+                new CodeMatch(OpCodes.Callvirt, getBiomObjectMethod),
+                new CodeMatch(OpCodes.Call, arraySetMethod)
+            };
+            matcher.MatchEndForward(tropicalGrowBackTarget);
+            matcher.Instruction.labels.Add(tropicalGrowBackCallLabel);
+            // move to the br instruction to label it
+            matcher.Advance(1);
+            matcher.Instruction.labels.Add(tropicalGrowBackBreakLabel);
+            // move back so we can insert before the call to Set
+            matcher.Advance(-1);
+
+            Label tropicalGrowBackPopLabel = generator.DefineLabel();
+            List<CodeInstruction> tropicalGrowBackInsertion = new List<CodeInstruction>()
+            {
+                // check tile type for cut grass
+                new CodeInstruction(OpCodes.Ldloc_1),
+                new CodeInstruction(OpCodes.Ldfld, tileTypeMapField),
+                new CodeInstruction(OpCodes.Ldloc_3),
+                new CodeInstruction(OpCodes.Ldloc_2),
+                new CodeInstruction(OpCodes.Call, arrayGetMethod),
+                new CodeInstruction(OpCodes.Ldc_I4, 25),
+                new CodeInstruction(OpCodes.Bne_Un, tropicalGrowBackCallLabel), // jump straight to the set call if it's regular tropical grass
+
+                new CodeInstruction(OpCodes.Dup),
+                new CodeInstruction(OpCodes.Ldc_I4, 4),
+                new CodeInstruction(OpCodes.Beq, tropicalGrowBackPopLabel),
+
+                new CodeInstruction(OpCodes.Dup),
+                new CodeInstruction(OpCodes.Ldc_I4, 5),
+                new CodeInstruction(OpCodes.Beq, tropicalGrowBackPopLabel),
+
+                new CodeInstruction(OpCodes.Dup),
+                new CodeInstruction(OpCodes.Ldc_I4, 135),
+                new CodeInstruction(OpCodes.Beq, tropicalGrowBackPopLabel),
+
+                new CodeInstruction(OpCodes.Dup),
+                new CodeInstruction(OpCodes.Ldc_I4, 296),
+                new CodeInstruction(OpCodes.Beq, tropicalGrowBackPopLabel),
+
+                new CodeInstruction(OpCodes.Dup),
+                new CodeInstruction(OpCodes.Ldc_I4, 297),
+                new CodeInstruction(OpCodes.Bne_Un, tropicalGrowBackCallLabel), // jump to the Set call if it's not any of the 5 values
+                // flow through to the Call Set
+                new CodeInstruction(OpCodes.Pop).WithLabels(tropicalGrowBackPopLabel),
+                new CodeInstruction(OpCodes.Br, tropicalGrowBackBreakLabel)
+            };
+            matcher.InsertAndAdvance(tropicalGrowBackInsertion);
 
             CodeMatch[] sixthTarget = new CodeMatch[]
             {
