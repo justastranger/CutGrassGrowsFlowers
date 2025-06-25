@@ -13,7 +13,7 @@ using UnityEngine.Rendering;
 namespace CutGrassGrowsFlowers
 {
 
-    [BepInPlugin("jas.CutGrassGrowsFlowers", "Cut Grass Grows Flowers", "1.0.0")]
+    [BepInPlugin("jas.CutGrassGrowsFlowers", "Cut Grass Grows Flowers", "1.0.1")]
     public class CutGrassGrowsFlowers : BaseUnityPlugin
     {
         internal static new ManualLogSource Logger;
