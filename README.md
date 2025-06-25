@@ -9,4 +9,4 @@ Works *very* well in Spring.
 ## Installation
 
 1. Install BepInEx 6.0.0-pre1
-2. Extract to `.\Dinkum\BepInEx\plugins`
+2. Extract `CutGrassGrowsFlowers.dll` to `.\Dinkum\BepInEx\plugins`
