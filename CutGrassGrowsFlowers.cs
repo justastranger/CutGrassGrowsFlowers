@@ -40,11 +40,11 @@ namespace CutGrassGrowsFlowers
     {
         public static void Postfix(WorldManager __instance, bool raining, int mineSeed)
         {
-            List<int> bushLandNonFlowers = new List<int> { 1, 13 };
+            List<int> bushLandNonFlowers = new List<int> { 1, 13, 403 };
             int bushLandCutGrass = 23;
-            List<int> tropicalNonFlowers = new List<int> { 4, 5, 135, 296, 297 };
+            List<int> tropicalNonFlowers = new List<int> { 1, 4, 5, 135, 296, 297, 403, 407 };
             int tropicalCutGrass = 24;
-            List<int> coldLandsNonFlowers = new List<int> { 137 };
+            List<int> coldLandsNonFlowers = new List<int> { 137, 402 };
             int coldLandsCutGrass = 25;
             var mapSize = 1000;
             for (int chunkY = 0; chunkY < mapSize / 10; chunkY++)
