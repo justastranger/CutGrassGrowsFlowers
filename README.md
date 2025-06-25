@@ -1,3 +1,7 @@
 # CutGrassGrowsFlowers
 
-Patches the spawning logic for flowers to check against cut grass tile IDs in addition to the uncut grass tiles for each biome grass type.
+Flowers will grow overnight on cut grass.
+
+This lets you mow sections of grass to use them as wildflower farms.
+
+Works *very* well in Spring.
