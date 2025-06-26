@@ -1,14 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.Rendering;
 
 namespace CutGrassGrowsFlowers
 {
@@ -25,12 +18,6 @@ namespace CutGrassGrowsFlowers
             Logger = base.Logger;
             Logger.LogInfo("Plugin jas.CutGrassGrowsFlowers is loaded!");
             harmony.PatchAll();
-            // harmony.Patch(nextDayChangesNestedType.GetMethod("MoveNext"), transpiler: new HarmonyMethod(typeof(WorldManagerPatch).GetMethod("nextDayChanges_Transpiler")));
-        }
-
-        private void Start()
-        {
-
         }
     }
 
