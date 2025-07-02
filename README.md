@@ -1,6 +1,6 @@
 # CutGrassGrowsFlowers
 
-Flowers will grow overnight on cut grass.
+Adds an extra pass during `WorldManager.nextDayChanges` so that flowers will grow overnight on cut grass with two chances per tile per night.
 
 This lets you mow sections of grass to use them as wildflower farms.
 
