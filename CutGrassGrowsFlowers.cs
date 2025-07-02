@@ -27,11 +27,12 @@ namespace CutGrassGrowsFlowers
     {
         public static void Postfix(WorldManager __instance, bool raining, int mineSeed)
         {
-            List<int> bushLandNonFlowers = new List<int> { 1, 13, 403 };
+            List<int> wildFlowers = new List<int> { 201, 202, 203, 204, 205, 499, 516, 517, 518, 521, 522, 523, 573, 574, 575, 783, 784, 785, 786, 787, };
+            // List<int> bushLandNonFlowers = new List<int> { 1, 13, 403 };
             int bushLandCutGrass = 23;
-            List<int> tropicalNonFlowers = new List<int> { 1, 4, 5, 135, 296, 297, 403, 407 };
+            // List<int> tropicalNonFlowers = new List<int> { 1, 4, 5, 135, 296, 297, 403, 407 };
             int tropicalCutGrass = 24;
-            List<int> coldLandsNonFlowers = new List<int> { 137, 402 };
+            // List<int> coldLandsNonFlowers = new List<int> { 137, 402 };
             int coldLandsCutGrass = 25;
             var mapSize = 1000;
             for (int chunkY = 0; chunkY < mapSize / 10; chunkY++)
@@ -55,7 +56,7 @@ namespace CutGrassGrowsFlowers
                                     {
                                         // GenerateMap.generate.bushLandGrowBack.getRandomObjectAndPlaceWithGrowth(j, i);
                                         int objectToSpawn = GenerateMap.generate.bushLandGrowBack.getBiomObject();
-                                        if (!bushLandNonFlowers.Contains(objectToSpawn))
+                                        if (wildFlowers.Contains(objectToSpawn))
                                         {
                                             __instance.onTileMap[j, i] = objectToSpawn;
                                             if (objectToSpawn != -1 && (bool)__instance.allObjects[objectToSpawn].tileObjectGrowthStages)
@@ -67,13 +68,13 @@ namespace CutGrassGrowsFlowers
                                     else if (__instance.tileTypeMap[j, i] == coldLandsCutGrass)
                                     {
                                         int objectToSpawn = GenerateMap.generate.tropicalGrowBack.getBiomObject();
-                                        if (!tropicalNonFlowers.Contains(objectToSpawn))
+                                        if (wildFlowers.Contains(objectToSpawn))
                                             __instance.onTileMap[j, i] = objectToSpawn;
                                     }
                                     else if (__instance.tileTypeMap[j, i] == tropicalCutGrass)
                                     {
                                         int objectToSpawn = GenerateMap.generate.coldLandGrowBack.getBiomObject();
-                                        if (!coldLandsNonFlowers.Contains(objectToSpawn))
+                                        if (wildFlowers.Contains(objectToSpawn))
                                             __instance.onTileMap[j, i] = objectToSpawn;
                                     }
                                     if (__instance.onTileMap[j, i] > -1)
