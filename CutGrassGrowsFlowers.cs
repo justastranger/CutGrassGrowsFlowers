@@ -6,17 +6,17 @@ using System.Collections.Generic;
 namespace CutGrassGrowsFlowers
 {
 
-    [BepInPlugin("jas.CutGrassGrowsFlowers", "Cut Grass Grows Flowers", "1.0.1")]
+    [BepInPlugin("jas.Dinkum.CutGrassGrowsFlowers", "Cut Grass Grows Flowers", "1.0.4")]
     public class CutGrassGrowsFlowers : BaseUnityPlugin
     {
         internal static new ManualLogSource Logger;
-        internal static Harmony harmony = new Harmony("jas.CutGrassGrowsFlowers");
+        internal static Harmony harmony = new Harmony("jas.Dinkum.CutGrassGrowsFlowers");
 
         private void Awake()
         {
             // Plugin startup logic
             Logger = base.Logger;
-            Logger.LogInfo("Plugin jas.CutGrassGrowsFlowers is loaded!");
+            Logger.LogInfo("Plugin jas.Dinkum.CutGrassGrowsFlowers is loaded!");
             harmony.PatchAll();
         }
     }
