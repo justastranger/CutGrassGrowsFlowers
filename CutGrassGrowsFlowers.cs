@@ -47,42 +47,46 @@ namespace CutGrassGrowsFlowers
                     {
                         for (int j = chunkX * 10; j < chunkX * 10 + 10; j++)
                         {
-                            if (__instance.tileTypeMap[j, i] == bushLandCutGrass || __instance.tileTypeMap[j, i] == coldLandsCutGrass || __instance.tileTypeMap[j, i] == tropicalCutGrass)
+                            if (__instance.onTileMap[j, i] == -1)
                             {
-                                if (__instance.tileTypeMap[j, i] == bushLandCutGrass)
+                                if (__instance.tileTypeMap[j, i] == bushLandCutGrass || __instance.tileTypeMap[j, i] == coldLandsCutGrass || __instance.tileTypeMap[j, i] == tropicalCutGrass)
                                 {
-                                    // GenerateMap.generate.bushLandGrowBack.getRandomObjectAndPlaceWithGrowth(j, i);
-                                    int objectToSpawn = GenerateMap.generate.bushLandGrowBack.getBiomObject();
-                                    if (!bushLandNonFlowers.Contains(objectToSpawn))
+                                    if (__instance.tileTypeMap[j, i] == bushLandCutGrass)
                                     {
-                                        __instance.onTileMap[j, i] = objectToSpawn;
-                                        if (objectToSpawn != -1 && (bool)__instance.allObjects[objectToSpawn].tileObjectGrowthStages)
+                                        // GenerateMap.generate.bushLandGrowBack.getRandomObjectAndPlaceWithGrowth(j, i);
+                                        int objectToSpawn = GenerateMap.generate.bushLandGrowBack.getBiomObject();
+                                        if (!bushLandNonFlowers.Contains(objectToSpawn))
+                                        {
+                                            __instance.onTileMap[j, i] = objectToSpawn;
+                                            if (objectToSpawn != -1 && (bool)__instance.allObjects[objectToSpawn].tileObjectGrowthStages)
+                                            {
+                                                __instance.onTileStatusMap[j, i] = 0;
+                                            }
+                                        }
+                                    }
+                                    else if (__instance.tileTypeMap[j, i] == coldLandsCutGrass)
+                                    {
+                                        int objectToSpawn = GenerateMap.generate.tropicalGrowBack.getBiomObject();
+                                        if (!tropicalNonFlowers.Contains(objectToSpawn))
+                                            __instance.onTileMap[j, i] = objectToSpawn;
+                                    }
+                                    else if (__instance.tileTypeMap[j, i] == tropicalCutGrass)
+                                    {
+                                        int objectToSpawn = GenerateMap.generate.coldLandGrowBack.getBiomObject();
+                                        if (!coldLandsNonFlowers.Contains(objectToSpawn))
+                                            __instance.onTileMap[j, i] = objectToSpawn;
+                                    }
+                                    if (__instance.onTileMap[j, i] > -1)
+                                    {
+                                        if ((bool)__instance.allObjects[__instance.onTileMap[j, i]].tileObjectGrowthStages)
                                         {
                                             __instance.onTileStatusMap[j, i] = 0;
                                         }
+                                        __instance.chunkHasChangedToday[chunkX, chunkY] = true;
                                     }
-                                }
-                                else if (__instance.tileTypeMap[j, i] == coldLandsCutGrass)
-                                {
-                                    int objectToSpawn = GenerateMap.generate.tropicalGrowBack.getBiomObject();
-                                    if (!tropicalNonFlowers.Contains(objectToSpawn))
-                                        __instance.onTileMap[j, i] = objectToSpawn;
-                                }
-                                else if (__instance.tileTypeMap[j, i] == tropicalCutGrass)
-                                {
-                                    int objectToSpawn = GenerateMap.generate.coldLandGrowBack.getBiomObject();
-                                    if (!coldLandsNonFlowers.Contains(objectToSpawn))
-                                        __instance.onTileMap[j, i] = objectToSpawn;
-                                }
-                                if (__instance.onTileMap[j, i] > -1)
-                                {
-                                    if ((bool)__instance.allObjects[__instance.onTileMap[j, i]].tileObjectGrowthStages)
-                                    {
-                                        __instance.onTileStatusMap[j, i] = 0;
-                                    }
-                                    __instance.chunkHasChangedToday[chunkX, chunkY] = true;
                                 }
                             }
+
                         }
                     }
                 }
