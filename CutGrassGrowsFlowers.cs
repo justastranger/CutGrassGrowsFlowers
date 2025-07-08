@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using System;
@@ -13,11 +14,13 @@ namespace CutGrassGrowsFlowers
     {
         internal static new ManualLogSource Logger;
         internal static Harmony harmony = new Harmony("jas.Dinkum.CutGrassGrowsFlowers");
+        internal static ConfigEntry<int> numberOfRolls;
 
         private void Awake()
         {
             // Plugin startup logic
             Logger = base.Logger;
+            numberOfRolls = Config.Bind<int>("config", "numberOfRolls", 2, "The number of times that a wildflower will attempt to be generated, per tile. Higher numbers increase the odds.");
             Logger.LogInfo("Plugin jas.Dinkum.CutGrassGrowsFlowers is loaded!");
             harmony.PatchAll();
         }
@@ -56,36 +59,16 @@ namespace CutGrassGrowsFlowers
                                 {
                                     if (__instance.tileTypeMap[j, i] == MowedBushGrass)
                                     {
-                                        int objectToSpawn = GenerateMap.generate.bushLandGrowBack.getBiomObject();
-                                        // one chance at a reroll
-                                        if (!wildFlowers.Contains(objectToSpawn))
-                                        {
-                                            objectToSpawn = GenerateMap.generate.bushLandGrowBack.getBiomObject();
-                                        }
-                                        if (wildFlowers.Contains(objectToSpawn))
-                                            __instance.onTileMap[j, i] = objectToSpawn;
+                                        // the new function either returns a wildflower ID or it returns -1, both of which are safe to assign without further checking
+                                        __instance.onTileMap[j, i] = RollBiomeSpawnTableForFlower(GenerateMap.generate.bushLandGrowBack, CutGrassGrowsFlowers.numberOfRolls.Value);
                                     }
                                     else if (__instance.tileTypeMap[j, i] == PineGrassMowed)
                                     {
-                                        int objectToSpawn = GenerateMap.generate.coldLandGrowBack.getBiomObject();
-                                        // one chance at a reroll
-                                        if (!wildFlowers.Contains(objectToSpawn))
-                                        {
-                                            objectToSpawn = GenerateMap.generate.coldLandGrowBack.getBiomObject();
-                                        }
-                                        if (wildFlowers.Contains(objectToSpawn))
-                                            __instance.onTileMap[j, i] = objectToSpawn;
+                                        __instance.onTileMap[j, i] = RollBiomeSpawnTableForFlower(GenerateMap.generate.coldLandGrowBack, CutGrassGrowsFlowers.numberOfRolls.Value);
                                     }
                                     else if (__instance.tileTypeMap[j, i] == TropicalGrassMowed)
                                     {
-                                        int objectToSpawn = GenerateMap.generate.tropicalGrowBack.getBiomObject();
-                                        // one chance at a reroll
-                                        if (!wildFlowers.Contains(objectToSpawn))
-                                        {
-                                            objectToSpawn = GenerateMap.generate.tropicalGrowBack.getBiomObject();
-                                        }
-                                        if (wildFlowers.Contains(objectToSpawn))
-                                            __instance.onTileMap[j, i] = objectToSpawn;
+                                        __instance.onTileMap[j, i] = RollBiomeSpawnTableForFlower(GenerateMap.generate.tropicalGrowBack, CutGrassGrowsFlowers.numberOfRolls.Value);
                                     }
                                     if (__instance.onTileMap[j, i] > -1)
                                     {
@@ -122,6 +105,8 @@ namespace CutGrassGrowsFlowers
             }
             // only return the tile object ID if it's a flower
             if (wildFlowers.Contains(tileObjectId)) return tileObjectId;
+            // otherwise return an "empty" tile
+            // since we're only operating on empty tiles to begin with, this should be safe to skip a check for -1 and assign it over itself
             else return -1;
         }
     }
