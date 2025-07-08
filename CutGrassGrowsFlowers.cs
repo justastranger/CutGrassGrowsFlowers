@@ -52,23 +52,15 @@ namespace CutGrassGrowsFlowers
                                 {
                                     if (__instance.tileTypeMap[j, i] == MowedBushGrass)
                                     {
-                                        // GenerateMap.generate.bushLandGrowBack.getRandomObjectAndPlaceWithGrowth(j, i);
                                         int objectToSpawn = GenerateMap.generate.bushLandGrowBack.getBiomObject();
                                         // one chance at a reroll
                                         if (!wildFlowers.Contains(objectToSpawn))
                                         {
                                             objectToSpawn = GenerateMap.generate.bushLandGrowBack.getBiomObject();
                                         }
-
                                         if (wildFlowers.Contains(objectToSpawn))
-                                        {
                                             __instance.onTileMap[j, i] = objectToSpawn;
-                                            if (objectToSpawn != -1 && (bool)__instance.allObjects[objectToSpawn].tileObjectGrowthStages)
-                                            {
-                                                __instance.onTileStatusMap[j, i] = 0;
                                             }
-                                        }
-                                    }
                                     else if (__instance.tileTypeMap[j, i] == PineGrassMowed)
                                     {
                                         int objectToSpawn = GenerateMap.generate.coldLandGrowBack.getBiomObject();
