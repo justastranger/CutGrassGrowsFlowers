@@ -28,12 +28,9 @@ namespace CutGrassGrowsFlowers
         public static void Postfix(WorldManager __instance, bool raining, int mineSeed)
         {
             List<int> wildFlowers = new List<int> { 201, 202, 203, 204, 205, 499, 516, 517, 518, 521, 522, 523, 573, 574, 575, 783, 784, 785, 786, 787, };
-            // List<int> bushLandNonFlowers = new List<int> { 1, 13, 403 };
-            int bushLandCutGrass = 23;
-            // List<int> tropicalNonFlowers = new List<int> { 1, 4, 5, 135, 296, 297, 403, 407 };
-            int tropicalCutGrass = 24;
-            // List<int> coldLandsNonFlowers = new List<int> { 137, 402 };
-            int coldLandsCutGrass = 25;
+            int MowedBushGrass = 23;
+            int PineGrassMowed = 24;
+            int TropicalGrassMowed = 25;
             var mapSize = 1000;
             for (int chunkY = 0; chunkY < mapSize / 10; chunkY++)
             {
@@ -50,9 +47,9 @@ namespace CutGrassGrowsFlowers
                         {
                             if (__instance.onTileMap[j, i] == -1)
                             {
-                                if (__instance.tileTypeMap[j, i] == bushLandCutGrass || __instance.tileTypeMap[j, i] == coldLandsCutGrass || __instance.tileTypeMap[j, i] == tropicalCutGrass)
+                                if (__instance.tileTypeMap[j, i] == MowedBushGrass || __instance.tileTypeMap[j, i] == PineGrassMowed || __instance.tileTypeMap[j, i] == TropicalGrassMowed)
                                 {
-                                    if (__instance.tileTypeMap[j, i] == bushLandCutGrass)
+                                    if (__instance.tileTypeMap[j, i] == MowedBushGrass)
                                     {
                                         // GenerateMap.generate.bushLandGrowBack.getRandomObjectAndPlaceWithGrowth(j, i);
                                         int objectToSpawn = GenerateMap.generate.bushLandGrowBack.getBiomObject();
@@ -71,24 +68,24 @@ namespace CutGrassGrowsFlowers
                                             }
                                         }
                                     }
-                                    else if (__instance.tileTypeMap[j, i] == coldLandsCutGrass)
-                                    {
-                                        int objectToSpawn = GenerateMap.generate.tropicalGrowBack.getBiomObject();
-                                        // one chance at a reroll
-                                        if (!wildFlowers.Contains(objectToSpawn))
-                                        {
-                                            objectToSpawn = GenerateMap.generate.tropicalGrowBack.getBiomObject();
-                                        }
-                                        if (wildFlowers.Contains(objectToSpawn))
-                                            __instance.onTileMap[j, i] = objectToSpawn;
-                                    }
-                                    else if (__instance.tileTypeMap[j, i] == tropicalCutGrass)
+                                    else if (__instance.tileTypeMap[j, i] == PineGrassMowed)
                                     {
                                         int objectToSpawn = GenerateMap.generate.coldLandGrowBack.getBiomObject();
                                         // one chance at a reroll
                                         if (!wildFlowers.Contains(objectToSpawn))
                                         {
                                             objectToSpawn = GenerateMap.generate.coldLandGrowBack.getBiomObject();
+                                        }
+                                        if (wildFlowers.Contains(objectToSpawn))
+                                            __instance.onTileMap[j, i] = objectToSpawn;
+                                    }
+                                    else if (__instance.tileTypeMap[j, i] == TropicalGrassMowed)
+                                    {
+                                        int objectToSpawn = GenerateMap.generate.tropicalGrowBack.getBiomObject();
+                                        // one chance at a reroll
+                                        if (!wildFlowers.Contains(objectToSpawn))
+                                        {
+                                            objectToSpawn = GenerateMap.generate.tropicalGrowBack.getBiomObject();
                                         }
                                         if (wildFlowers.Contains(objectToSpawn))
                                             __instance.onTileMap[j, i] = objectToSpawn;
