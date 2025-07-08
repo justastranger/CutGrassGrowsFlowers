@@ -1,7 +1,9 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CutGrassGrowsFlowers
 {
@@ -46,8 +48,10 @@ namespace CutGrassGrowsFlowers
                     {
                         for (int j = chunkX * 10; j < chunkX * 10 + 10; j++)
                         {
+                            // only trigger on "empty" tiles
                             if (__instance.onTileMap[j, i] == -1)
                             {
+                                // where the tile type is one of the three mowed grass types
                                 if (__instance.tileTypeMap[j, i] == MowedBushGrass || __instance.tileTypeMap[j, i] == PineGrassMowed || __instance.tileTypeMap[j, i] == TropicalGrassMowed)
                                 {
                                     if (__instance.tileTypeMap[j, i] == MowedBushGrass)
@@ -60,7 +64,7 @@ namespace CutGrassGrowsFlowers
                                         }
                                         if (wildFlowers.Contains(objectToSpawn))
                                             __instance.onTileMap[j, i] = objectToSpawn;
-                                            }
+                                    }
                                     else if (__instance.tileTypeMap[j, i] == PineGrassMowed)
                                     {
                                         int objectToSpawn = GenerateMap.generate.coldLandGrowBack.getBiomObject();
@@ -98,8 +102,27 @@ namespace CutGrassGrowsFlowers
                     }
                 }
             }
+        }
 
-
+        private static int RollBiomeSpawnTableForFlower(BiomSpawnTable table, int attempts = 1)
+        {
+            if (table == null) throw new NullReferenceException("BiomSpawnTable must not be null");
+            // potentially expensive check against spawn tables that lack flowers
+            // if (!table.objectsInBiom.Select(to => to.tileObjectId).Intersect(wildFlowers).Any()) return -1;
+            int tileObjectId = table.getBiomObject();
+            // chance to reroll an arbitrary number of times
+            // potentially an issue if a BiomSpawnTable without *any* wild flowers is supplied
+            if (attempts > 1 && !wildFlowers.Contains(tileObjectId))
+            {
+                while (!wildFlowers.Contains(tileObjectId) && attempts > 1)
+                {
+                    tileObjectId = table.getBiomObject();
+                    attempts--;
+                }
+            }
+            // only return the tile object ID if it's a flower
+            if (wildFlowers.Contains(tileObjectId)) return tileObjectId;
+            else return -1;
         }
     }
 }
