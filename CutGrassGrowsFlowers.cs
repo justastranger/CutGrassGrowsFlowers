@@ -9,7 +9,7 @@ using System.Linq;
 namespace CutGrassGrowsFlowers
 {
 
-    [BepInPlugin("jas.Dinkum.CutGrassGrowsFlowers", "Cut Grass Grows Flowers", "1.0.4")]
+    [BepInPlugin("jas.Dinkum.CutGrassGrowsFlowers", "Cut Grass Grows Flowers", "1.1.0")]
     public class CutGrassGrowsFlowers : BaseUnityPlugin
     {
         internal static new ManualLogSource Logger;
