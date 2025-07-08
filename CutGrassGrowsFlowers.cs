@@ -30,7 +30,7 @@ namespace CutGrassGrowsFlowers
     [HarmonyPatch("WorldManager", "nextDayChanges")]
     public class WorldManagerPatch
     {
-        private static List<int> wildFlowers = new List<int> { 201, 202, 203, 204, 205, 498, 499, 500, 516, 517, 518, 521, 522, 523, 573, 574, 575, 783, 784, 785, 786, 787 };
+        private static readonly List<int> wildFlowers = new List<int> { 201, 202, 203, 204, 205, 498, 499, 500, 516, 517, 518, 521, 522, 523, 573, 574, 575, 783, 784, 785, 786, 787 };
 
         public static void Postfix(WorldManager __instance, bool raining, int mineSeed)
         {
