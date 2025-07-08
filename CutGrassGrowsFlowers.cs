@@ -30,7 +30,7 @@ namespace CutGrassGrowsFlowers
     [HarmonyPatch("WorldManager", "nextDayChanges")]
     public class WorldManagerPatch
     {
-        private static readonly List<int> wildFlowers = new List<int> { 201, 202, 203, 204, 205, 498, 499, 500, 516, 517, 518, 521, 522, 523, 573, 574, 575, 783, 784, 785, 786, 787 };
+        private static readonly HashSet<int> wildFlowers = new HashSet<int> { 201, 202, 203, 204, 205, 498, 499, 500, 516, 517, 518, 521, 522, 523, 573, 574, 575, 783, 784, 785, 786, 787 };
 
         public static void Postfix(WorldManager __instance, bool raining, int mineSeed)
         {
@@ -93,7 +93,7 @@ namespace CutGrassGrowsFlowers
             // potentially expensive check against spawn tables that lack flowers
             // if (!table.objectsInBiom.Select(to => to.tileObjectId).Intersect(wildFlowers).Any()) return -1;
             int tileObjectId = table.getBiomObject();
-            // chance to reroll an arbitrary number of times
+            // chance to reroll an arbitrary number of times, skipped if there isn't more than 1 roll or if it's already a wildflower
             // potentially an issue if a BiomSpawnTable without *any* wild flowers is supplied
             if (attempts > 1 && !wildFlowers.Contains(tileObjectId))
             {
@@ -103,7 +103,7 @@ namespace CutGrassGrowsFlowers
                     attempts--;
                 }
             }
-            // only return the tile object ID if it's a flower
+            // only return the tile object ID if it's a flower since the while loop will produce a non-flower value if it's not lucky
             if (wildFlowers.Contains(tileObjectId)) return tileObjectId;
             // otherwise return an "empty" tile
             // since we're only operating on empty tiles to begin with, this should be safe to skip a check for -1 and assign it over itself
