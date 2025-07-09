@@ -15,14 +15,20 @@ namespace CutGrassGrowsFlowers
         internal static new ManualLogSource Logger;
         internal static Harmony harmony = new Harmony("jas.Dinkum.CutGrassGrowsFlowers");
         internal static ConfigEntry<int> numberOfRolls;
+        internal static ConfigEntry<bool> spawnMushrooms;
 
         private void Awake()
         {
             // Plugin startup logic
             Logger = base.Logger;
             numberOfRolls = Config.Bind<int>("config", "numberOfRolls", 2, "The number of times that a wildflower will attempt to be generated, per tile. Higher numbers increase the odds.");
+            spawnMushrooms = Config.Bind<bool>("config", "spawnMushrooms", true, "Controls whether or not mushrooms will spawn on mowed grass.");
             Logger.LogInfo("Plugin jas.Dinkum.CutGrassGrowsFlowers is loaded!");
             harmony.PatchAll();
+            if (spawnMushrooms.Value)
+            {
+                WorldManagerPatch.wildFlowers.UnionWith(new int[] { 783, 784, 785, 786, 787 });
+            }
         }
     }
 
@@ -30,7 +36,7 @@ namespace CutGrassGrowsFlowers
     [HarmonyPatch("WorldManager", "nextDayChanges")]
     public class WorldManagerPatch
     {
-        private static readonly HashSet<int> wildFlowers = new HashSet<int> { 201, 202, 203, 204, 205, 498, 499, 500, 516, 517, 518, 521, 522, 523, 573, 574, 575, 783, 784, 785, 786, 787 };
+        internal static readonly HashSet<int> wildFlowers = new HashSet<int> { 201, 202, 203, 204, 205, 498, 499, 500, 516, 517, 518, 521, 522, 523, 573, 574, 575 };
 
         public static void Postfix(WorldManager __instance, bool raining, int mineSeed)
         {
